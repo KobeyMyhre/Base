@@ -20,6 +20,7 @@ class Factory
 	ObjectPool<TurretRotation> turretRotations;
 	ObjectPool<Enemy> enemys;
 	ObjectPool<HUD> HUDs;
+	ObjectPool<EndBox> EndBoxs;
 public:
 
 	// iterators to access the entity pool
@@ -31,7 +32,7 @@ public:
 								: entities(size), transforms(size), rigidbodies(size),
 								  colliders(size), sprites(size), lifetimes(size),
 								  cameras(size), controllers(size), texts(size), enemyDirectors(size),
-									turretRotations(size), enemys(size), HUDs(size)
+									turretRotations(size), enemys(size), HUDs(size), EndBoxs(size)
 	{
 	}
 
@@ -98,6 +99,23 @@ public:
 
 		return e;
 	}
+	//ObjectPool<Entity>::iterator spawnTurretText(float x,float y,unsigned font, int Num)
+	//{
+	//	auto e = entities.push();
+	//	e->hUD = HUDs.push();
+	//	e->transform = transforms.push();
+	//	e->text = texts.push();
+	//	e->text->sprite_id = font;
+	//	e->transform->setLocalScale(vec2{ 10,15 });
+	//	e->transform->setLocalPosition(vec2{ x,y });
+	//	e->hUD->TurretNum = Num;
+
+	//	//e->text->setString(buffer);
+
+	//	return e;
+	//}
+
+
 
 	ObjectPool<Entity>::iterator spawnPlayer(unsigned sprite, unsigned font)
 	{
@@ -139,7 +157,7 @@ public:
 		return e;
 	}
 
-	ObjectPool<Entity>::iterator spawnEnemy(float x, float y,unsigned sprite)
+	ObjectPool<Entity>::iterator spawnEnemy(float x, float y,unsigned sprite, int health)
 	{
 		auto e = entities.push();
 		e->enemy = enemys.push();
@@ -153,11 +171,25 @@ public:
 		
 		e->transform->setLocalPosition(vec2{ x,y });
 		e->transform->setLocalScale(vec2{ 48,48 });
-
+		e->enemy->health = health;
 		e->sprite->sprite_id = sprite;
 
 		return e;
 	}
+	ObjectPool<Entity>::iterator spawnEnd(float x, float y)
+	{
+		auto e = entities.push();
+		e->transform = transforms.push();
+		e->collider = colliders.push();
+		e->endBox = EndBoxs.push();
+
+		e->transform->setLocalPosition(vec2{ x,y });
+		e->transform->setLocalScale(vec2{ 48,48 });
+		e->collider->trigger = true;
+
+		return e;
+	}
+	
 
 	ObjectPool<Entity>::iterator spawnAsteroid(unsigned sprite)
 	{

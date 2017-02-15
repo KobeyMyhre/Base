@@ -6,6 +6,7 @@
 #include "TurretRotation.h"
 #include "Enemy.h"
 #include "Hud.h"
+#include "EndBox.h"
 using namespace base;
 
 
@@ -23,6 +24,8 @@ public:
 	ObjectPool<TurretRotation>::iterator turretRotation;
 	ObjectPool<Enemy>::iterator enemy;
 	ObjectPool<HUD>::iterator hUD;
+	ObjectPool<EndBox>::iterator endBox;
+
 	// example of a component in this project
 	ObjectPool<PlayerController>::iterator controller;
 

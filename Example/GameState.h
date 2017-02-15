@@ -55,9 +55,10 @@ public:
 		factory.spawnTurretNode(-150, 120, spr_TurretNode, 1);
 		factory.spawnTurretNode(-220, 0, spr_TurretNode, 2);
 		factory.spawnTurretNode(-70, 120, spr_TurretNode, 3);
-
+		
 
 		//factory.spawnEnemy(-500, 50, spr_enemy);
+		factory.spawnEnd(300, -40);
 		factory.spawnDir(50, 50, false, true);
 		factory.spawnDir(25, -75, true, false);
 		//factory.spawnTurretNode(-50, -10, spr_TurretNode);
@@ -86,14 +87,20 @@ public:
 		float dt = sfw::getDeltaTime();
 		
 		Wave.SpawnTimer -= dt;
-
-		if (Wave.SpawnTimer <= 0)
+		if(Wave.WaveStarted == true)
 		{
-			factory.spawnEnemy(-500, 50, spr_enemy);
-			Wave.SpawnTimer = Wave.SpawnTime;
+			if (Wave.SpawnTimer <= 0 && Wave.EnemyCount >=0)
+			{
+				factory.spawnEnemy(-500, 50, spr_enemy, (Wave.Wave * 20 + 80));
+				Wave.EnemyCount--;
+				Wave.SpawnTimer = Wave.SpawnTime;
+				
+			}
 		}
+		
 
 		Wave.Generate();
+		Wave.StartWave();
 		// maybe spawn some asteroids here.
 
 		for(auto it = factory.begin(); it != factory.end();) // no++!
@@ -110,10 +117,16 @@ public:
 				del = true;
 			}
 
+			if (e.controller)
+			{
+				e.controller->TurretUpgrade(Wave);
+			}
+			
 
 			if (e.text && e.hUD)
 			{
 				e.hUD->update(*e.text, Wave);
+				//e.hUD->updateTurretText(*e.text, &e.controller);
 			}
 
 			/*if (e.transform && e.rigidbody && e.sprite && e.collider)
@@ -200,6 +213,13 @@ public:
 							{
 								bit->turretRotation->FaceEnemy(&bit->transform, &bit->controller, &it->transform,dt);
 							}
+
+
+							if (it->endBox && bit->enemy)
+							{
+								it->endBox->end(Wave, &bit->enemy);
+							}
+
 							//base::EnemyDirDownResolution(cd, &it->transform, &it->rigidbody);
 							//base::EnemyDirRightResolution(cd, &it->transform, &it->rigidbody);
 						}
@@ -220,6 +240,8 @@ public:
 								{
 									it->enemy->TakeDamge();
 								}
+
+								
 								// condition for dynamic resolution
 								//if (it->rigidbody && bit->rigidbody)
 								//	base::DynamicResolution(cd,&it->transform,&it->rigidbody, &bit->transform, &bit->rigidbody);

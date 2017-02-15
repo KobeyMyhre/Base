@@ -126,6 +126,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="EndBox.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyDirector.h" />
     <ClInclude Include="Entity.h" />
