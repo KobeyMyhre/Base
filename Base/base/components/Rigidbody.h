@@ -12,6 +12,9 @@ public:
 	float drag, mass;
 	vec2 impulse, force, acceleration, velocity; // defaults to 0's
 
+	bool Right = true;
+	bool down = false;
+
 	float angularDrag;
 	float spin, torque, angularAcceleration, angularVelocity;
 
@@ -42,6 +45,8 @@ public:
 
 
 	}
+
+
 
 	void draw(const Transform *T, const mat3 &cam)
 	{
@@ -91,6 +96,20 @@ inline void StaticResolution(const collision &cd, Transform *AT, Rigidbody *AR, 
 
 	AR->velocity = reflect(AR->velocity, cd.normal) * bounciness;
 }
-
+//inline void EnemyDirRightResolution(const collision &cd, Transform *AT, Rigidbody *AR, float bounciness = 1)
+//{
+//	/*vec2 MTV = cd.penetration * cd.normal;
+//	AT->setGlobalPosition(AT->getGlobalPosition() - MTV);
+//
+//	AR->velocity = reflect(AR->velocity, cd.normal) * bounciness;*/
+//
+//	EnemyDirector enemyD;
+//	if (enemyD.down == true)
+//	{
+//		enemyD.down = false;
+//		enemyD.right = true;
+//	}
+//
+//}
 
 }

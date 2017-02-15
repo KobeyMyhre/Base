@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Entity.h"
-
+#include "WaveManager.h"
+#include <cstring>
 class Factory
 {	
 	ObjectPool<Entity>	  entities;
@@ -15,7 +16,10 @@ class Factory
 	ObjectPool<Camera>    cameras;
 	ObjectPool<Text>	  texts;
 	ObjectPool<PlayerController> controllers;
-
+	ObjectPool<EnemyDirector> enemyDirectors;
+	ObjectPool<TurretRotation> turretRotations;
+	ObjectPool<Enemy> enemys;
+	ObjectPool<HUD> HUDs;
 public:
 
 	// iterators to access the entity pool
@@ -26,7 +30,8 @@ public:
 	Factory(size_t size = 512)
 								: entities(size), transforms(size), rigidbodies(size),
 								  colliders(size), sprites(size), lifetimes(size),
-								  cameras(size), controllers(size), texts(size)
+								  cameras(size), controllers(size), texts(size), enemyDirectors(size),
+									turretRotations(size), enemys(size), HUDs(size)
 	{
 	}
 
@@ -78,6 +83,22 @@ public:
 		return e;
 	}
 
+	ObjectPool<Entity>::iterator spawnHUD(unsigned font, WaveManager &Wave)
+	{
+		auto e = entities.push();
+		e->hUD = HUDs.push();
+		e->transform = transforms.push();
+		e->text = texts.push();
+		e->text->sprite_id = font;
+		e->transform->setLocalScale(vec2{ 10,15 });
+		e->transform->setLocalPosition(vec2{ 200,250 });
+
+		
+		//e->text->setString(buffer);
+
+		return e;
+	}
+
 	ObjectPool<Entity>::iterator spawnPlayer(unsigned sprite, unsigned font)
 	{
 		auto e = entities.push();
@@ -102,6 +123,42 @@ public:
 	}
 
 
+	ObjectPool<Entity>::iterator spawnDir(float x, float y, bool right, bool down)
+	{
+		auto e = entities.push();
+
+		e->transform = transforms.push();
+		e->transform->setLocalPosition(vec2{ x,y });
+		e->collider = colliders.push();
+		e->transform->setLocalScale(vec2{24,24});
+		e->collider->trigger = true;
+		e->enemyDirector = enemyDirectors.push();
+		e->enemyDirector->down = down;
+		e->enemyDirector->right = right;
+
+		return e;
+	}
+
+	ObjectPool<Entity>::iterator spawnEnemy(float x, float y,unsigned sprite)
+	{
+		auto e = entities.push();
+		e->enemy = enemys.push();
+		e->transform = transforms.push();
+		e->rigidbody = rigidbodies.push();
+		e->sprite = sprites.push();
+		e->collider = colliders.push();
+		e->enemyDirector = enemyDirectors.push();
+
+		e->rigidbody->velocity = vec2{50,0};
+		
+		e->transform->setLocalPosition(vec2{ x,y });
+		e->transform->setLocalScale(vec2{ 48,48 });
+
+		e->sprite->sprite_id = sprite;
+
+		return e;
+	}
+
 	ObjectPool<Entity>::iterator spawnAsteroid(unsigned sprite)
 	{
 		auto e = entities.push();
@@ -119,6 +176,44 @@ public:
 
 		e->sprite->sprite_id = sprite;
 
+		return e;
+	}
+
+	//ObjectPool<Entity>::iterator spawnTurret(float x, float y, unsigned sprite, float Tnum)
+	//{
+	//	auto e = entities.push();
+	//	e->transform = transforms.push();
+	//	e->sprite = sprites.push();
+
+	//	e->transform->setLocalPosition(vec2{ x,y });
+	//	e->transform->setLocalScale(vec2{ 48,48 });
+	//	
+	//	e->sprite->sprite_id = sprite;
+
+	//	return e;
+	//}
+
+	ObjectPool<Entity>::iterator spawnTurretNode(float x, float y, unsigned sprite, float Tnum)
+	{
+		auto e = entities.push();
+		e->transform = transforms.push();
+		e->collider = colliders.push(Collider(3.f));
+		e->turretRotation = turretRotations.push();
+		e->sprite = sprites.push();
+		e->controller = controllers.push();
+		e->controller->TurretNum = Tnum;
+		e->sprite->sprite_id = sprite;
+		e->transform->setLocalPosition(vec2{x,y});
+		e->transform->setLocalScale(vec2{ 48,48 });
+		e->sprite->angle = -1.57f;
+		e->collider->trigger = true;
+		
+		/*
+		
+sfw::drawLine(x, y, x + 50, y, BLACK);
+		sfw::drawLine(x, y, x, y + 50, BLACK);
+		sfw::drawLine(x + 50, y, x + 50, y + 50, BLACK);
+		sfw::drawLine(x, y + 50, x + 50, y + 50, BLACK);*/
 		return e;
 	}
 };

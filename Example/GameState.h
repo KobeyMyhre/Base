@@ -3,7 +3,7 @@
 #include "sfwdraw.h"
 #include "BaseState.h"
 #include "Factory.h"
-
+#include "WaveManager.h"
 
 /*
 	The gamestate represents a discrete container of all that is 
@@ -19,36 +19,54 @@
 class GameState : public BaseState
 {
 	Factory factory;
-	unsigned spr_space, spr_ship, spr_bullet, spr_roid, spr_font;
+	WaveManager Wave;
+	unsigned spr_space,spr_enemy, spr_font,spr_TurretNode, spr_bullet;
 	ObjectPool<Entity>::iterator currentCamera;
+	
 
 public:
 	virtual void init()
 	{
-		spr_bullet = sfw::loadTextureMap("../res/bullet.png");
-		spr_space = sfw::loadTextureMap("../res/space.jpg");
-		spr_ship = sfw::loadTextureMap("../res/ship.png");
-		spr_roid = sfw::loadTextureMap("../res/rock.png");
+		
+		spr_space = sfw::loadTextureMap("../res/Map.png");
+		spr_enemy = sfw::loadTextureMap("../res/Enemy.png");
+		spr_TurretNode = sfw::loadTextureMap("../res/dickasshole.png");
+		spr_bullet = sfw::loadTextureMap("../res/Bullets.png");
+		
 		spr_font = sfw::loadTextureMap("../res/font.png",32,4);
 	}
 
 	virtual void play()
 	{
+		
 		// delete any old entities sitting around
 		for (auto it = factory.begin(); it != factory.end(); it->onFree(), it.free());
 
 		// setup a default camera
 		currentCamera = factory.spawnCamera(800, 600, 1);
-		currentCamera->transform->setGlobalPosition(vec2{ 400, 300 });
+		currentCamera->camera->offset = vec2{ 400,300 };
+		//currentCamera->camera->scale = vec2{2,2};
 
 		// call some spawning functions!
 		factory.spawnStaticImage(spr_space, 0, 0, 800, 600);
+		factory.spawnHUD(spr_font, Wave);
 
-		factory.spawnPlayer(spr_ship, spr_font);
-		factory.spawnAsteroid(spr_roid);
-		factory.spawnAsteroid(spr_roid);
-		factory.spawnAsteroid(spr_roid);
-		factory.spawnAsteroid(spr_roid);
+		factory.spawnTurretNode(-70, -10,spr_TurretNode,0);
+		factory.spawnTurretNode(-150, 120, spr_TurretNode, 1);
+		factory.spawnTurretNode(-220, 0, spr_TurretNode, 2);
+		factory.spawnTurretNode(-70, 120, spr_TurretNode, 3);
+
+
+		//factory.spawnEnemy(-500, 50, spr_enemy);
+		factory.spawnDir(50, 50, false, true);
+		factory.spawnDir(25, -75, true, false);
+		//factory.spawnTurretNode(-50, -10, spr_TurretNode);
+
+		//factory.spawnPlayer(spr_ship, spr_font);
+		//factory.spawnAsteroid(spr_roid);
+		//factory.spawnAsteroid(spr_roid);
+		//factory.spawnAsteroid(spr_roid);
+		//factory.spawnAsteroid(spr_roid);
 	}
 
 	virtual void stop()
@@ -64,25 +82,73 @@ public:
 	// update loop, where 'systems' exist
 	virtual void step()
 	{
+		
 		float dt = sfw::getDeltaTime();
+		
+		Wave.SpawnTimer -= dt;
 
+		if (Wave.SpawnTimer <= 0)
+		{
+			factory.spawnEnemy(-500, 50, spr_enemy);
+			Wave.SpawnTimer = Wave.SpawnTime;
+		}
+
+		Wave.Generate();
 		// maybe spawn some asteroids here.
 
 		for(auto it = factory.begin(); it != factory.end();) // no++!
 		{
 			bool del = false; // does this entity end up dying?
 			auto &e = *it;    // convenience reference
-
+			
 			// rigidbody update
 			if (e.transform && e.rigidbody)
 				e.rigidbody->integrate(&e.transform, dt);
 
-			// controller update
-			if (e.transform && e.rigidbody && e.controller)
+			if (e.enemy && e.enemy->IsDead(Wave))
 			{
-				e.controller->poll(&e.transform, &e.rigidbody, dt);
+				del = true;
+			}
+
+
+			if (e.text && e.hUD)
+			{
+				e.hUD->update(*e.text, Wave);
+			}
+
+			/*if (e.transform && e.rigidbody && e.sprite && e.collider)
+			{
+				e.rigidbody->Pathing(&e.transform, dt);
+			}*/
+
+			if (e.transform && e.sprite && e.controller)
+			{
+				e.controller->NodeOperator(&e.transform, &e.sprite);
+				e.controller->TurretPlacement(&e.transform, &e.sprite, Wave);
+
+				//if (e.controller->SpawnTurret)
+				//{
+				//	for each(auto &e in factory)
+				//		if(e.controller->TurretNum /*&& turret node hasn't been used yet*/)
+				//		{
+				//			e.controller.activate();
+				//			//e.transform->getGlobalPosition();
+				//			//factory.spawnTurret();
+				//			break;
+				//		}
+				//	
+				//}
+			}
+				
+
+
+			// controller update
+			if (e.transform && e.controller)
+			{
+				//e.controller->poll(Wave);
 				if (e.controller->shotRequest) // controller requested a bullet fire
 				{
+		
 					factory.spawnBullet(spr_bullet, e.transform->getGlobalPosition()  + e.transform->getGlobalUp()*48,
 											vec2{ 32,32 }, e.transform->getGlobalAngle(), 200, 1);
 				}
@@ -117,19 +183,51 @@ public:
 					// test their bounding boxes
 					if (base::BoundsTest(&it->transform, &it->collider, &bit->transform, &bit->collider))
 					{
-						// if true, get the penetration and normal from the convex hulls
 						auto cd = base::ColliderTest(&it->transform, &it->collider, &bit->transform, &bit->collider);
-						
-						// if there was a collision,
-						if (cd.result())
+
+						if (it->collider->trigger || bit->collider->trigger)
 						{
-							// condition for dynamic resolution
-							if (it->rigidbody && bit->rigidbody)
-								base::DynamicResolution(cd,&it->transform,&it->rigidbody, &bit->transform, &bit->rigidbody);
+							if (it->enemyDirector && bit->rigidbody && bit->enemyDirector)
+								it->enemyDirector->direct(&bit->rigidbody);
+							if (bit->enemyDirector && it->rigidbody && it->enemyDirector)
+								bit->enemyDirector->direct(&it->rigidbody);
+
+							if (it->controller && bit->rigidbody && !bit->lifetime)
+							{
+								it->turretRotation->FaceEnemy(&it->transform, &it->controller, &bit->transform,dt);
+							}
+							if (bit->controller && it->rigidbody && !it->lifetime)
+							{
+								bit->turretRotation->FaceEnemy(&bit->transform, &bit->controller, &it->transform,dt);
+							}
+							//base::EnemyDirDownResolution(cd, &it->transform, &it->rigidbody);
+							//base::EnemyDirRightResolution(cd, &it->transform, &it->rigidbody);
+						}
+
+						else
+						{
+							// if true, get the penetration and normal from the convex hulls
+							//auto cd = base::ColliderTest(&it->transform, &it->collider, &bit->transform, &bit->collider);
+						
+							// if there was a collision,
+							if (cd.result())
+							{
+								if (it->rigidbody && bit->enemy && !it->enemy )
+								{
+									bit->enemy->TakeDamge();
+								}
+								if (bit->rigidbody && it->enemy && !bit->enemy)
+								{
+									it->enemy->TakeDamge();
+								}
+								// condition for dynamic resolution
+								//if (it->rigidbody && bit->rigidbody)
+								//	base::DynamicResolution(cd,&it->transform,&it->rigidbody, &bit->transform, &bit->rigidbody);
 							
-							// condition for static resolution
-							else if (it->rigidbody && !bit->rigidbody)							
-								base::StaticResolution(cd, &it->transform, &it->rigidbody);					
+								//// condition for static resolution
+								//else if (it->rigidbody && !bit->rigidbody)							
+								//	base::StaticResolution(cd, &it->transform, &it->rigidbody);					
+							}
 						}
 					}
 				}
@@ -145,8 +243,9 @@ public:
 		// draw sprites
 		for each(auto &e in factory)
 			if (e.transform && e.sprite)
+			{
 				e.sprite->draw(&e.transform, cam);
-
+			}
 		// draw text
 		for each(auto &e in factory)
 			if (e.transform && e.text)
