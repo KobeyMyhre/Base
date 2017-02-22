@@ -87,7 +87,7 @@ public:
 		factory.spawnDir(-100, 250, true, false, false, false);
 		factory.spawnDir(-105, -240, true, false, false, false);
 		factory.spawnDir(90, -80, true, false, false, false);
-		factory.spawnDir(160, -240, true, false, false, false);
+		factory.spawnDir(190, -240, true, false, false, false);
 		//Up
 		factory.spawnDir(-40, 90, false, false, true, false);
 		factory.spawnDir(105, -240, false, false, true, false);
@@ -218,15 +218,18 @@ public:
 				//e.controller->poll(Wave);
 				if (e.controller->shotRequest) // controller requested a bullet fire
 				{
+					e.controller->shotRequest = false;
 					if (e.controller->UpgradeTurret)
 					{
 						factory.spawnBullet(spr_UpgradeBullet, e.transform->getGlobalPosition() + e.transform->getGlobalUp() * 48,
 							vec2{ 32,32 }, e.transform->getGlobalAngle(), 200, 1);
+						
 					}
 					else
 					{
 						factory.spawnBullet(spr_bullet, e.transform->getGlobalPosition() + e.transform->getGlobalUp() * 48,
 							vec2{ 32,32 }, e.transform->getGlobalAngle(), 200, 1);
+						
 					}
 					
 					
@@ -293,18 +296,7 @@ public:
 							//base::EnemyDirDownResolution(cd, &it->transform, &it->rigidbody);
 							//base::EnemyDirRightResolution(cd, &it->transform, &it->rigidbody);
 						}
-						else if(!base::BoundsTest(&it->transform, &it->collider, &bit->transform, &bit->collider))
-						{
-							if (it->enemy && bit->turretRotation)
-							{
-								bit->turretRotation->ShutDown(&bit->controller);
-							}
-							
-							if (bit->enemy && it->turretRotation)
-							{
-								it->turretRotation->ShutDown(&it->controller);
-							}
-						}
+						
 
 						else
 						{
@@ -361,7 +353,7 @@ public:
 
 
 #ifdef _DEBUG
-		for each(auto &e in factory)
+	/*	for each(auto &e in factory)
 			if (e.transform)
 				e.transform->draw(cam);
 
@@ -371,7 +363,7 @@ public:
 
 		for each(auto &e in factory)
 			if (e.transform && e.rigidbody)
-				e.rigidbody->draw(&e.transform, cam);
+				e.rigidbody->draw(&e.transform, cam);*/
 #endif
 	}
 };
