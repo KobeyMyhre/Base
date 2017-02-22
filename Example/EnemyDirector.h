@@ -8,8 +8,9 @@ class EnemyDirector
 {
 public:
 	bool right = true, down = false;
+	bool Up = false, Left = false;
 	//Rigidbody rbody;
-	
+	float speed = 50;
 
 	void direct(Rigidbody *o_rb)
 	{
@@ -21,12 +22,22 @@ public:
 
 		if (right == true)
 		{
-			o_rb->velocity = vec2{ 50, 0 };
+			o_rb->velocity = vec2{ speed, 0 };
 			//o_rb->addForce(vec2{ 1,0 });
 		}
 		if (down == true)
 		{
-			o_rb->velocity = vec2{ 0,-50 };
+			o_rb->velocity = vec2{ 0,-speed };
+			//o_rb->addForce(vec2{ 0,1 });
+		}
+		if (Up == true)
+		{
+			o_rb->velocity = vec2{ 0, speed };
+			//o_rb->addForce(vec2{ 1,0 });
+		}
+		if (Left == true)
+		{
+			o_rb->velocity = vec2{ -speed,0 };
 			//o_rb->addForce(vec2{ 0,1 });
 		}
 	}

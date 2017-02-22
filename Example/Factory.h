@@ -141,7 +141,7 @@ public:
 	}
 
 
-	ObjectPool<Entity>::iterator spawnDir(float x, float y, bool right, bool down)
+	ObjectPool<Entity>::iterator spawnDir(float x, float y, bool right, bool down, bool Up, bool Left)
 	{
 		auto e = entities.push();
 
@@ -153,11 +153,13 @@ public:
 		e->enemyDirector = enemyDirectors.push();
 		e->enemyDirector->down = down;
 		e->enemyDirector->right = right;
+		e->enemyDirector->Up = Up;
+		e->enemyDirector->Left = Left;
 
 		return e;
 	}
 
-	ObjectPool<Entity>::iterator spawnEnemy(float x, float y,unsigned sprite, int health)
+	ObjectPool<Entity>::iterator spawnEnemy(float x, float y, unsigned sprite, int health, int Enum)
 	{
 		auto e = entities.push();
 		e->enemy = enemys.push();
@@ -172,6 +174,7 @@ public:
 		e->transform->setLocalPosition(vec2{ x,y });
 		e->transform->setLocalScale(vec2{ 48,48 });
 		e->enemy->health = health;
+		e->enemy->EnemyNum = Enum;
 		e->sprite->sprite_id = sprite;
 
 		return e;
@@ -225,7 +228,7 @@ public:
 	//	return e;
 	//}
 
-	ObjectPool<Entity>::iterator spawnTurretNode(float x, float y, unsigned sprite, float Tnum)
+	ObjectPool<Entity>::iterator spawnTurretNode(float x, float y, unsigned sprite, int Tnum)
 	{
 		auto e = entities.push();
 		e->transform = transforms.push();

@@ -4,11 +4,14 @@
 class Enemy
 {
 public:
-	int health = 100;
+	int health = 2;
 	bool MadeIt = false;
+	int EnemyNum;
+	bool Picked = false;
 	void TakeDamge()
 	{
 		health -= 2;
+		
 		
 	}
 	/*void updateHealth(WaveManager &Wave)
@@ -24,7 +27,7 @@ public:
 		
 		if (health <= 0)
 		{
-			Wave.gold += 5;
+			Wave.gold += (Wave.Wave + 2);
 			
 			return true;
 		}

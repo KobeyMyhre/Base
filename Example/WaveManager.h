@@ -6,39 +6,49 @@ public:
 	bool WaveStarted = false;
 	int Wave = 0;
 	int Health = 10;
-	float SpawnTime = 3.f;
+	float SpawnTime = 3.5f;
 	float SpawnTimer = SpawnTime;
-	int EnemysToSpawn = 10;
+	int EnemysToSpawn = 8;
 	int EnemyCount = EnemysToSpawn;
 	
-	int gold = 800;
-	int BuildCost = 800;
+
+	
+
+	int gold = 50;
+	int BuildCost = 50;
+	int UpgradeCost = 25;
 	bool Buildable = false;
 	bool upgradeable = false;
 
-	inline void Generate()
+	inline void Generate(float dt)
 	{
-		if (WaveStarted == true)
+		/*if (WaveStarted == true)
 		{
 			gold++;
-		}
+		}*/
 		
-		if (gold >= 800)
+		/*if (gold >= 1600)
 		{
-			gold = 800;
-		}
+			gold = 1600;
+		}*/
 		if (gold >= BuildCost)
 		{
 			Buildable = true;
-		}
-		if (gold >= (BuildCost / 2))
-		{
-			upgradeable = true;
 		}
 		else
 		{
 			Buildable = false;
 		}
+
+		if (gold >= UpgradeCost)
+		{
+			upgradeable = true;
+		}
+		else
+		{
+			upgradeable = false;
+		}
+	
 	}
 
 	inline void StartWave()
@@ -57,7 +67,7 @@ public:
 			EnemyCount = EnemysToSpawn;
 			if (SpawnTime >= 0.5f)
 			{
-				SpawnTime -= 0.2f;
+				SpawnTime -= 0.3f;
 			}
 			
 		}

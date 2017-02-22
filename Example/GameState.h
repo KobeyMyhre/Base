@@ -20,7 +20,7 @@ class GameState : public BaseState
 {
 	Factory factory;
 	WaveManager Wave;
-	unsigned spr_space,spr_enemy, spr_font,spr_TurretNode, spr_bullet;
+	unsigned spr_space,spr_enemy, spr_font,spr_TurretNode, spr_bullet, spr_UpgradeBullet;
 	ObjectPool<Entity>::iterator currentCamera;
 	
 
@@ -28,11 +28,11 @@ public:
 	virtual void init()
 	{
 		
-		spr_space = sfw::loadTextureMap("../res/Map.png");
+		spr_space = sfw::loadTextureMap("../res/BetterMap.png");
 		spr_enemy = sfw::loadTextureMap("../res/Enemy.png");
-		spr_TurretNode = sfw::loadTextureMap("../res/dickasshole.png");
+		spr_TurretNode = sfw::loadTextureMap("../res/TurretNode.png");
 		spr_bullet = sfw::loadTextureMap("../res/Bullets.png");
-		
+		spr_UpgradeBullet = sfw::loadTextureMap("../res/UpgradeBullet.png");
 		spr_font = sfw::loadTextureMap("../res/font.png",32,4);
 	}
 
@@ -51,16 +51,49 @@ public:
 		factory.spawnStaticImage(spr_space, 0, 0, 800, 600);
 		factory.spawnHUD(spr_font, Wave);
 
-		factory.spawnTurretNode(-70, -10,spr_TurretNode,0);
-		factory.spawnTurretNode(-150, 120, spr_TurretNode, 1);
-		factory.spawnTurretNode(-220, 0, spr_TurretNode, 2);
-		factory.spawnTurretNode(-70, 120, spr_TurretNode, 3);
+		factory.spawnTurretNode(-250, 175, spr_TurretNode, 0);
+		factory.spawnTurretNode(-145, 170, spr_TurretNode, 1);
+		factory.spawnTurretNode(-10, 175, spr_TurretNode, 2);
+
+		factory.spawnTurretNode(130, 175, spr_TurretNode, 3);
+		
+		factory.spawnTurretNode(-70, 60, spr_TurretNode, 4);
+
+		factory.spawnTurretNode(10, 60, spr_TurretNode, 5);
+		factory.spawnTurretNode(-10, -50, spr_TurretNode, 6);
+		factory.spawnTurretNode(40, -50, spr_TurretNode, 7);
+		factory.spawnTurretNode(-10, -150, spr_TurretNode, 8);
+		factory.spawnTurretNode(130, -150, spr_TurretNode, 9);
+		factory.spawnTurretNode(250, -150, spr_TurretNode, 10);
+
+		
+		
+		
+		//factory.spawnTurretNode(250, -150, spr_TurretNode, 11);
+		
 		
 
 		//factory.spawnEnemy(-500, 50, spr_enemy);
-		factory.spawnEnd(300, -40);
-		factory.spawnDir(50, 50, false, true);
-		factory.spawnDir(25, -75, true, false);
+		factory.spawnEnd(370, -210);
+
+		//Down
+		factory.spawnDir(-170, 230, false, true,false,false);
+		factory.spawnDir(100, 230, false, true, false, false);
+		factory.spawnDir(-105, 0, false, true, false, false);
+		factory.spawnDir(230, -100, false, true, false, false);
+		//Right
+		factory.spawnDir(-200, 90, true, false,false,false);
+		factory.spawnDir(-100, 250, true, false, false, false);
+		factory.spawnDir(-105, -240, true, false, false, false);
+		factory.spawnDir(90, -80, true, false, false, false);
+		factory.spawnDir(160, -240, true, false, false, false);
+		//Up
+		factory.spawnDir(-40, 90, false, false, true, false);
+		factory.spawnDir(105, -240, false, false, true, false);
+		//Left
+		factory.spawnDir(100, -30, false, false, false, true);
+
+
 		//factory.spawnTurretNode(-50, -10, spr_TurretNode);
 
 		//factory.spawnPlayer(spr_ship, spr_font);
@@ -87,19 +120,21 @@ public:
 		float dt = sfw::getDeltaTime();
 		
 		Wave.SpawnTimer -= dt;
+		
 		if(Wave.WaveStarted == true)
 		{
 			if (Wave.SpawnTimer <= 0 && Wave.EnemyCount >=0)
 			{
-				factory.spawnEnemy(-500, 50, spr_enemy, (Wave.Wave * 20 + 80));
+				factory.spawnEnemy(-500, 220, spr_enemy, (Wave.Wave * 2 + 1), Wave.EnemyCount);
 				Wave.EnemyCount--;
 				Wave.SpawnTimer = Wave.SpawnTime;
 				
 			}
 		}
 		
+		
 
-		Wave.Generate();
+		Wave.Generate(dt);
 		Wave.StartWave();
 		// maybe spawn some asteroids here.
 
@@ -120,6 +155,12 @@ public:
 			if (e.controller)
 			{
 				e.controller->TurretUpgrade(Wave);
+			
+			}
+
+			if (e.enemyDirector )
+			{
+				e.enemyDirector->speed = (Wave.Wave *10.f + 50);
 			}
 			
 
@@ -136,8 +177,8 @@ public:
 
 			if (e.transform && e.sprite && e.controller)
 			{
-				e.controller->NodeOperator(&e.transform, &e.sprite);
-				e.controller->TurretPlacement(&e.transform, &e.sprite, Wave);
+				e.controller->NodeOperator(&e.transform, &e.sprite,dt);
+				e.controller->TurretPlacement(&e.transform, &e.sprite, Wave,dt);
 
 				//if (e.controller->SpawnTurret)
 				//{
@@ -158,12 +199,22 @@ public:
 			// controller update
 			if (e.transform && e.controller)
 			{
+			
 				//e.controller->poll(Wave);
 				if (e.controller->shotRequest) // controller requested a bullet fire
 				{
-		
-					factory.spawnBullet(spr_bullet, e.transform->getGlobalPosition()  + e.transform->getGlobalUp()*48,
-											vec2{ 32,32 }, e.transform->getGlobalAngle(), 200, 1);
+					if (e.controller->UpgradeTurret)
+					{
+						factory.spawnBullet(spr_UpgradeBullet, e.transform->getGlobalPosition() + e.transform->getGlobalUp() * 48,
+							vec2{ 32,32 }, e.transform->getGlobalAngle(), 200, 1);
+					}
+					else
+					{
+						factory.spawnBullet(spr_bullet, e.transform->getGlobalPosition() + e.transform->getGlobalUp() * 48,
+							vec2{ 32,32 }, e.transform->getGlobalAngle(), 200, 1);
+					}
+					
+					
 				}
 			}
 			// lifetime decay update
@@ -174,6 +225,8 @@ public:
 					del = true;
 			}
 
+			if (e.turretRotation)
+				e.turretRotation->m_dist = 34534543;
 			// ++ here, because free increments in case of deletions
 			if (!del) it++;
 			else
@@ -209,10 +262,12 @@ public:
 							{
 								it->turretRotation->FaceEnemy(&it->transform, &it->controller, &bit->transform,dt);
 							}
+						
 							if (bit->controller && it->rigidbody && !it->lifetime)
 							{
 								bit->turretRotation->FaceEnemy(&bit->transform, &bit->controller, &it->transform,dt);
 							}
+						
 
 
 							if (it->endBox && bit->enemy)
@@ -222,6 +277,18 @@ public:
 
 							//base::EnemyDirDownResolution(cd, &it->transform, &it->rigidbody);
 							//base::EnemyDirRightResolution(cd, &it->transform, &it->rigidbody);
+						}
+						else if(!base::BoundsTest(&it->transform, &it->collider, &bit->transform, &bit->collider))
+						{
+							if (it->enemy && bit->turretRotation)
+							{
+								bit->turretRotation->ShutDown(&bit->controller);
+							}
+							
+							if (bit->enemy && it->turretRotation)
+							{
+								it->turretRotation->ShutDown(&it->controller);
+							}
 						}
 
 						else
@@ -235,10 +302,14 @@ public:
 								if (it->rigidbody && bit->enemy && !it->enemy )
 								{
 									bit->enemy->TakeDamge();
+									it->onFree();
+									it.free();
 								}
 								if (bit->rigidbody && it->enemy && !bit->enemy)
 								{
 									it->enemy->TakeDamge();
+									bit->onFree();
+									bit.free();
 								}
 
 								
