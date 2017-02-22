@@ -126,6 +126,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Depart.h" />
     <ClInclude Include="EndBox.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyDirector.h" />
@@ -133,6 +134,8 @@
     <ClInclude Include="Factory.h" />
     <ClInclude Include="GameState.h" />
     <ClInclude Include="Hud.h" />
+    <ClInclude Include="MenuState.h" />
+    <ClInclude Include="Option.h" />
     <ClInclude Include="PlayerController.h" />
     <ClInclude Include="TurretRotation.h" />
     <ClInclude Include="WaveManager.h" />

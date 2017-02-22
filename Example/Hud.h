@@ -12,7 +12,7 @@ public:
 	void update(base::Text &scoreText, WaveManager &wave)
 	{
 		char buffer[80];
-		sprintf_s(buffer, " Energy: %d \n Wave: %d \n Health: %d ", wave.gold, wave.Wave,wave.Health);
+		sprintf_s(buffer, " Gold: %d \n Wave: %d \n Health: %d ", wave.gold, wave.Wave,wave.Health);
 
 		scoreText.setString(buffer);
 	}

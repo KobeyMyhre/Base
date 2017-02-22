@@ -159,7 +159,7 @@ public:
 		return e;
 	}
 
-	ObjectPool<Entity>::iterator spawnEnemy(float x, float y, unsigned sprite, int health, int Enum)
+	ObjectPool<Entity>::iterator spawnEnemy(float x, float y, unsigned sprite, int health, float Speed)
 	{
 		auto e = entities.push();
 		e->enemy = enemys.push();
@@ -169,12 +169,12 @@ public:
 		e->collider = colliders.push();
 		e->enemyDirector = enemyDirectors.push();
 
-		e->rigidbody->velocity = vec2{50,0};
+		e->rigidbody->velocity = vec2{Speed,0};
 		
 		e->transform->setLocalPosition(vec2{ x,y });
 		e->transform->setLocalScale(vec2{ 48,48 });
 		e->enemy->health = health;
-		e->enemy->EnemyNum = Enum;
+		//e->enemy->EnemyNum = Enum;
 		e->sprite->sprite_id = sprite;
 
 		return e;

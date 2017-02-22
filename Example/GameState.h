@@ -4,6 +4,7 @@
 #include "BaseState.h"
 #include "Factory.h"
 #include "WaveManager.h"
+#include "MenuState.h"
 
 /*
 	The gamestate represents a discrete container of all that is 
@@ -108,9 +109,18 @@ public:
 
 	}
 
+	  
+
 	// should return what state we're going to.
 	// REMEMBER TO HAVE ENTRY AND STAY states for each application state!
-	virtual size_t next() const { return 0; }
+	virtual size_t next() const 
+	{
+		if (Wave.Health <= 0)
+		{
+			return (size_t)Enter_Depart;
+		}
+		else return (size_t)AGame;
+	}
 
 
 	// update loop, where 'systems' exist
@@ -125,7 +135,7 @@ public:
 		{
 			if (Wave.SpawnTimer <= 0 && Wave.EnemyCount >=0)
 			{
-				factory.spawnEnemy(-500, 220, spr_enemy, (Wave.Wave * 2 + 1), Wave.EnemyCount);
+				factory.spawnEnemy(-500, 220, spr_enemy, (Wave.Wave * 2 + 1), Wave.Wave *10.f + 50);
 				Wave.EnemyCount--;
 				Wave.SpawnTimer = Wave.SpawnTime;
 				
@@ -156,6 +166,11 @@ public:
 			{
 				e.controller->TurretUpgrade(Wave);
 			
+			}
+
+			if (e.enemy)
+			{
+				e.enemy->UpdateCOLOR(&e.sprite,dt);
 			}
 
 			if (e.enemyDirector )
@@ -301,13 +316,13 @@ public:
 							{
 								if (it->rigidbody && bit->enemy && !it->enemy )
 								{
-									bit->enemy->TakeDamge();
+									bit->enemy->TakeDamge(&bit->sprite, dt);
 									it->onFree();
 									it.free();
 								}
 								if (bit->rigidbody && it->enemy && !bit->enemy)
 								{
-									it->enemy->TakeDamge();
+									it->enemy->TakeDamge(&it->sprite, dt);
 									bit->onFree();
 									bit.free();
 								}
