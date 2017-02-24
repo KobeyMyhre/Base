@@ -216,9 +216,9 @@ public:
 			{
 			
 				//e.controller->poll(Wave);
-				if (e.controller->shotRequest) // controller requested a bullet fire
+				if (e.controller->shotRequest == true) // controller requested a bullet fire
 				{
-					e.controller->shotRequest = false;
+					//e.controller->shotRequest = false;
 					if (e.controller->UpgradeTurret)
 					{
 						factory.spawnBullet(spr_UpgradeBullet, e.transform->getGlobalPosition() + e.transform->getGlobalUp() * 48,
@@ -293,8 +293,8 @@ public:
 								it->endBox->end(Wave, &bit->enemy);
 							}
 
-							//base::EnemyDirDownResolution(cd, &it->transform, &it->rigidbody);
-							//base::EnemyDirRightResolution(cd, &it->transform, &it->rigidbody);
+					/*		base::EnemyDirDownResolution(cd, &it->transform, &it->rigidbody);
+							base::EnemyDirRightResolution(cd, &it->transform, &it->rigidbody);*/
 						}
 						
 

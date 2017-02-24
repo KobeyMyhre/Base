@@ -50,10 +50,10 @@ public:
 		VTimer -= dt;
 		//shotTimer -= dt;
 		
-		/*if (shotTimer > 0)
-		{
-			shotRequest = false;
-		}*/
+		//if (shotTimer > 0)
+		//{
+		//	shotRequest = false;
+		//}
 
 		if (TurretNum == TurretSelction)
 		{
