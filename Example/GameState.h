@@ -135,7 +135,7 @@ public:
 		{
 			if (Wave.SpawnTimer <= 0 && Wave.EnemyCount >=0)
 			{
-				factory.spawnEnemy(-500, 220, spr_enemy, (Wave.Wave * 2 + 1), Wave.Wave *10.f + 50);
+				factory.spawnEnemy(-500, 220, spr_enemy, (Wave.Wave * 2 + 1), Wave.Wave *5.f + 50);
 				Wave.EnemyCount--;
 				Wave.SpawnTimer = Wave.SpawnTime;
 				
@@ -175,7 +175,7 @@ public:
 
 			if (e.enemyDirector )
 			{
-				e.enemyDirector->speed = (Wave.Wave *10.f + 50);
+				e.enemyDirector->speed = (Wave.Wave *5.f + 50);
 			}
 			
 
@@ -218,7 +218,7 @@ public:
 				//e.controller->poll(Wave);
 				if (e.controller->shotRequest == true) // controller requested a bullet fire
 				{
-					//e.controller->shotRequest = false;
+					e.controller->shotRequest = false;
 					if (e.controller->UpgradeTurret)
 					{
 						factory.spawnBullet(spr_UpgradeBullet, e.transform->getGlobalPosition() + e.transform->getGlobalUp() * 48,
@@ -308,14 +308,15 @@ public:
 							{
 								if (it->rigidbody && bit->enemy && !it->enemy )
 								{
-									bit->enemy->TakeDamge(&bit->sprite, dt);
-									it->onFree();
+									bit->enemy->TakeDamge(&bit->sprite, dt, &it->lifetime);
+									//it->onFree();
 									//it.free();
 								}
 								if (bit->rigidbody && it->enemy && !bit->enemy)
 								{
-									it->enemy->TakeDamge(&it->sprite, dt);
-									bit->onFree();
+									it->enemy->TakeDamge(&it->sprite, dt, &bit->lifetime);
+									
+									//bit->onFree();
 									//bit.free();
 								}
 

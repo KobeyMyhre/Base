@@ -43,5 +43,6 @@ public:
 		turretRotation.free();
 		enemy.free();
 		hUD.free();
+		endBox.free();
 	}
 };

@@ -9,11 +9,11 @@ public:
 	int EnemyNum;
 	bool Picked = false;
 	float colorTimer = 0.2f;
-	void TakeDamge(Sprite *sp, float dt)
+	void TakeDamge(Sprite *sp, float dt, Lifetime *L)
 	{
 		health -= 2;
 		sp->tint = RED;
-		
+		L->lifespan = 0;
 		
 
 		
