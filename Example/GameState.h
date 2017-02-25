@@ -310,13 +310,13 @@ public:
 								{
 									bit->enemy->TakeDamge(&bit->sprite, dt);
 									it->onFree();
-									it.free();
+									//it.free();
 								}
 								if (bit->rigidbody && it->enemy && !bit->enemy)
 								{
 									it->enemy->TakeDamge(&it->sprite, dt);
 									bit->onFree();
-									bit.free();
+									//bit.free();
 								}
 
 								
