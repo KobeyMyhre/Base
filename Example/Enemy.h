@@ -9,6 +9,9 @@ public:
 	int EnemyNum;
 	bool Picked = false;
 	float colorTimer = 0.2f;
+	//
+	// KEIL LOOOK OVER HERE!!!!!!
+	//
 	void TakeDamge(Sprite *sp, float dt, Lifetime *L)
 	{
 		health -= 2;

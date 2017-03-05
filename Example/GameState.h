@@ -304,6 +304,9 @@ public:
 							//auto cd = base::ColliderTest(&it->transform, &it->collider, &bit->transform, &bit->collider);
 						
 							// if there was a collision,
+							//
+							// KEIL LOOOK OVER HERE!!!!!!!
+							//
 							if (cd.result())
 							{
 								if (it->rigidbody && bit->enemy && !it->enemy )
