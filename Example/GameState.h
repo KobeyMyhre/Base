@@ -21,7 +21,7 @@ class GameState : public BaseState
 {
 	Factory factory;
 	WaveManager Wave;
-	unsigned spr_space,spr_enemy, spr_font,spr_TurretNode, spr_bullet, spr_UpgradeBullet;
+	unsigned spr_space,spr_enemy, spr_font,spr_TurretNode, spr_bullet, spr_UpgradeBullet, spr_UpgradeBullet2;
 	ObjectPool<Entity>::iterator currentCamera;
 	
 
@@ -30,10 +30,11 @@ public:
 	{
 		
 		spr_space = sfw::loadTextureMap("../res/BetterMap.png");
-		spr_enemy = sfw::loadTextureMap("../res/Enemy.png");
+		spr_enemy = sfw::loadTextureMap("../res/Enemy2.png");
 		spr_TurretNode = sfw::loadTextureMap("../res/TurretNode.png");
 		spr_bullet = sfw::loadTextureMap("../res/Bullets.png");
 		spr_UpgradeBullet = sfw::loadTextureMap("../res/UpgradeBullet.png");
+		spr_UpgradeBullet2 = sfw::loadTextureMap("../res/UpgradeBullet2.png");
 		spr_font = sfw::loadTextureMap("../res/font.png",32,4);
 	}
 
@@ -219,7 +220,12 @@ public:
 				if (e.controller->shotRequest == true) // controller requested a bullet fire
 				{
 					e.controller->shotRequest = false;
-					if (e.controller->UpgradeTurret)
+					if (e.controller->UpgradeTurret2)
+					{
+						factory.spawnBullet(spr_UpgradeBullet2, e.transform->getGlobalPosition() + e.transform->getGlobalUp() * 48,
+							vec2{ 32,32 }, e.transform->getGlobalAngle(), 200, 1);
+					}
+					else if (e.controller->UpgradeTurret)
 					{
 						factory.spawnBullet(spr_UpgradeBullet, e.transform->getGlobalPosition() + e.transform->getGlobalUp() * 48,
 							vec2{ 32,32 }, e.transform->getGlobalAngle(), 200, 1);

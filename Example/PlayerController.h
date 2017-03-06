@@ -20,6 +20,7 @@ public:
 	bool shotRequest = false;
 	bool ActivateTurret = false; // [8] = { false,false,false,false,false,false,false,false };
 	bool UpgradeTurret = false; // [8] = { false,false,false,false ,false,false,false,false };
+	bool UpgradeTurret2 = false;
 	bool ButtonPressedB = false;
 	/*void poll(WaveManager &W)
 	{
@@ -33,10 +34,16 @@ public:
 
 	void TurretUpgrade(WaveManager &W)
 	{
-		if (UpgradeTurret == true)
+		if (UpgradeTurret == true && UpgradeTurret2 == false)
 		{
 			ATKspeed = 1.0f;
 			
+
+		}
+		if (UpgradeTurret == true && UpgradeTurret2 == true)
+		{
+			ATKspeed = .5f;
+
 
 		}
 	}
@@ -71,6 +78,14 @@ public:
 			W.gold -= W.UpgradeCost;
 			VTimer = 1.f;
 			
+		}
+		if (VTimer <= 0 && sfw::getKey('V') && W.upgradeable2 == true && ActivateTurret == true && UpgradeTurret == true)
+		{
+			UpgradeTurret2 = true;
+			//T->setGlobalScale(vec2{ 60, 60 });
+			W.gold -= W.UpgradeCost * 2;
+			VTimer = 1.f;
+
 		}
 		}
 		//if (BTimer <= 0 && sfw::getKey('B') && W.Buildable == true && ActivateTurret[TurretSelction] == false)

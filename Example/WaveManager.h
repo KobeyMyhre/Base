@@ -19,6 +19,7 @@ public:
 	int UpgradeCost = 25;
 	bool Buildable = false;
 	bool upgradeable = false;
+	bool upgradeable2 = false;
 
 	inline void Generate(float dt)
 	{
@@ -34,10 +35,12 @@ public:
 		if (gold >= BuildCost)
 		{
 			Buildable = true;
+			upgradeable2 = true;
 		}
 		else
 		{
 			Buildable = false;
+			upgradeable2 = false;
 		}
 
 		if (gold >= UpgradeCost)
@@ -48,6 +51,7 @@ public:
 		{
 			upgradeable = false;
 		}
+	
 	
 	}
 
